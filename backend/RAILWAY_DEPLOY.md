@@ -66,9 +66,17 @@ git push origin main
 |---------|-------|--------|
 | **Service Name** | `backend` (atau nama bebas) | Dashboard |
 | **Root Directory** | `backend` | Dashboard |
-| **Start Command** | `uvicorn app.main:app --host 0.0.0.0 --port $PORT` | `backend/railway.toml` ✅ |
+| **Start Command** | `python migrate.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT` | `backend/railway.toml` ✅ |
 
 > **Catatan:** Jika Railway mendeteksi `backend/railway.toml`, **Start Command** akan otomatis terisi dari config file. Pastikan Root Directory di-set ke `backend` agar Railway menemukan file-nya.
+>
+> **Auto Migration:** Script `migrate.py` otomatis berjalan setiap kali deploy. Script ini:
+> 1. Membuat semua tabel dari model SQLAlchemy (`create_all`)
+> 2. Menambahkan kolom yang belum ada (role, is_active, name, auth_provider)
+> 3. Seed default settings (AI_BASE_URL, AI_API_KEY, AI_MODEL)
+> 4. Promote user pertama menjadi admin (jika belum ada admin)
+>
+> Script ini **idempotent** — aman dijalankan berulang kali tanpa efek samping.
 
 3. **Connect ke PostgreSQL:**
    - Di tab **"Variables"** → klik **"New Variable"**
