@@ -2,13 +2,21 @@ import re
 from typing import Optional
 import httpx
 from fastapi import APIRouter, HTTPException
+from ..config import env
 from ..schemas import DOIMetadata
 
 router = APIRouter(prefix="/api/doi", tags=["doi"])
 
 CROSSREF_API = "https://api.crossref.org/works"
 OPENALEX_API = "https://api.openalex.org/works"
-OPENALEX_EMAIL = "admin@papier.app"
+UNPAYWALL_API = "https://api.unpaywall.org"
+CONTACT_EMAIL = env("CONTACT_EMAIL", "admin@papier.app")
+BROWSER_USER_AGENT = (
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+    "AppleWebKit/537.36 (KHTML, like Gecko) "
+    "Chrome/120.0.0.0 Safari/537.36"
+)
+APP_USER_AGENT = "Papier/1.0"
 
 
 def normalize_keywords(values, limit=8):
@@ -32,7 +40,7 @@ async def fetch_from_openalex(client: httpx.AsyncClient, doi: str) -> Optional[D
     try:
         resp = await client.get(
             f"{OPENALEX_API}/doi:{doi}",
-            params={"mailto": OPENALEX_EMAIL},
+            params={"mailto": CONTACT_EMAIL},
             timeout=10,
         )
         if resp.status_code != 200:
@@ -107,7 +115,7 @@ async def fetch_doi(doi: str):
         async with httpx.AsyncClient(timeout=15) as client:
             resp = await client.get(
                 f"{CROSSREF_API}/{doi}",
-                headers={"User-Agent": "Papier/1.0 (mailto:admin@papier.app)"},
+                headers={"User-Agent": f"{APP_USER_AGENT} (mailto:{CONTACT_EMAIL})"},
             )
             if resp.status_code == 200:
                 data = resp.json()["message"]

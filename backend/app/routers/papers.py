@@ -14,6 +14,7 @@ from ..models import Paper, Category, Tag, User
 from ..schemas import PaperCreate, PaperUpdate, PaperOut
 from ..auth import get_current_user
 from ..storage import delete_r2_object, is_r2_path, r2_enabled, stream_r2_object, upload_pdf_to_r2
+from .doi import OPENALEX_API, UNPAYWALL_API, CONTACT_EMAIL, BROWSER_USER_AGENT, APP_USER_AGENT
 
 router = APIRouter(prefix="/api/papers", tags=["papers"])
 
@@ -335,7 +336,7 @@ def upload_pdf(
 def _get_browser_headers(url: str = "") -> dict:
     """Return browser-like headers that are less likely to be blocked by academic servers."""
     headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "User-Agent": BROWSER_USER_AGENT,
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/pdf,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
         "Accept-Encoding": "gzip, deflate, br",
@@ -504,13 +505,13 @@ def validate_pdf_url(url: str) -> bool:
     """Check if URL actually points to a PDF by doing a HEAD request."""
     try:
         with httpx.Client(timeout=10, follow_redirects=True) as client:
-            resp = client.head(url, headers={"User-Agent": "Papier/1.0"})
+            resp = client.head(url, headers={"User-Agent": APP_USER_AGENT})
             content_type = resp.headers.get("Content-Type", "").lower()
             if "application/pdf" in content_type or "application/octet-stream" in content_type:
                 return True
             # Some servers don't support HEAD, try GET with range
             if resp.status_code == 405 or resp.status_code == 403:
-                with client.stream("GET", url, headers={"User-Agent": "Papier/1.0", "Range": "bytes=0-1023"}) as get_resp:
+                with client.stream("GET", url, headers={"User-Agent": APP_USER_AGENT, "Range": "bytes=0-1023"}) as get_resp:
                     ct = get_resp.headers.get("Content-Type", "").lower()
                     return "application/pdf" in ct or "application/octet-stream" in ct
             return False
@@ -562,9 +563,9 @@ def resolve_pdf_url(
         try:
             with httpx.Client(timeout=15, follow_redirects=True) as client:
                 resp = client.get(
-                    f"https://api.openalex.org/works/doi:{paper.doi}",
-                    params={"mailto": "admin@papier.app"},
-                    headers={"User-Agent": "Papier/1.0"},
+                    f"{OPENALEX_API}/doi:{paper.doi}",
+                    params={"mailto": CONTACT_EMAIL},
+                    headers={"User-Agent": APP_USER_AGENT},
                 )
                 if resp.status_code == 200:
                     data = resp.json()
@@ -590,8 +591,8 @@ def resolve_pdf_url(
             try:
                 with httpx.Client(timeout=15, follow_redirects=True) as client:
                     resp = client.get(
-                        f"https://api.unpaywall.org/v2/{paper.doi}?email=admin@papier.app",
-                        headers={"User-Agent": "Papier/1.0"},
+                        f"{UNPAYWALL_API}/v2/{paper.doi}?email={CONTACT_EMAIL}",
+                        headers={"User-Agent": APP_USER_AGENT},
                     )
                     if resp.status_code == 200:
                         data = resp.json()

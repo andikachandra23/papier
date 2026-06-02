@@ -20,6 +20,9 @@ from ..config import env
 from ..database import get_db
 from ..models import Paper, User, AIUsageLog, Setting
 from ..storage import is_r2_path, stream_r2_object
+from .doi import BROWSER_USER_AGENT
+
+AI_DEFAULT_MODEL = env("AI_DEFAULT_MODEL", "mimo-v2.5-pro")
 
 router = APIRouter(prefix="/api/papers", tags=["summarize"])
 
@@ -101,9 +104,7 @@ def _get_paper_pages(paper: Paper) -> list[dict]:
             return _extract_pages_from_file(paper.pdf_path)
     elif paper.pdf_url:
         headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                           "AppleWebKit/537.36 (KHTML, like Gecko) "
-                           "Chrome/120.0.0.0 Safari/537.36",
+            "User-Agent": BROWSER_USER_AGENT,
         }
         with httpx.Client(timeout=60, follow_redirects=True) as client:
             resp = client.get(paper.pdf_url, headers=headers)
@@ -132,11 +133,11 @@ def _summarize_with_ai(text: str, max_sentences: int = 7, paper_title: str = "",
     if db:
         api_key = _get_ai_setting(db, "ai_api_key", "AI_API_KEY")
         base_url = _get_ai_setting(db, "ai_base_url", "AI_BASE_URL")
-        model_name = _get_ai_setting(db, "ai_model", "AI_MODEL", "mimo-v2.5-pro")
+        model_name = _get_ai_setting(db, "ai_model", "AI_MODEL", AI_DEFAULT_MODEL)
     else:
         api_key = env("AI_API_KEY")
         base_url = env("AI_BASE_URL")
-        model_name = env("AI_MODEL", "mimo-v2.5-pro")
+        model_name = env("AI_MODEL", AI_DEFAULT_MODEL)
 
     if not api_key:
         raise HTTPException(
@@ -364,7 +365,7 @@ def summarize_paper(
     paper.summary_generated_at = datetime.now(timezone.utc)
 
     # Log token usage
-    logged_model = _get_ai_setting(db, "ai_model", "AI_MODEL", "mimo-v2.5-pro")
+    logged_model = _get_ai_setting(db, "ai_model", "AI_MODEL", AI_DEFAULT_MODEL)
     usage_log = AIUsageLog(
         user_id=current_user.id,
         paper_id=paper.id,
@@ -441,11 +442,11 @@ def _generate_auto_highlights_with_ai(
     if db:
         api_key = _get_ai_setting(db, "ai_api_key", "AI_API_KEY")
         base_url = _get_ai_setting(db, "ai_base_url", "AI_BASE_URL")
-        model_name = _get_ai_setting(db, "ai_model", "AI_MODEL", "mimo-v2.5-pro")
+        model_name = _get_ai_setting(db, "ai_model", "AI_MODEL", AI_DEFAULT_MODEL)
     else:
         api_key = env("AI_API_KEY")
         base_url = env("AI_BASE_URL")
-        model_name = env("AI_MODEL", "mimo-v2.5-pro")
+        model_name = env("AI_MODEL", AI_DEFAULT_MODEL)
 
     if not api_key:
         raise HTTPException(
@@ -632,7 +633,7 @@ def auto_highlight_paper(
     )
 
     # Log token usage
-    logged_model = _get_ai_setting(db, "ai_model", "AI_MODEL", "mimo-v2.5-pro")
+    logged_model = _get_ai_setting(db, "ai_model", "AI_MODEL", AI_DEFAULT_MODEL)
     usage_log = AIUsageLog(
         user_id=current_user.id,
         paper_id=paper.id,
