@@ -574,6 +574,84 @@
 .fade-in-delay-4 { transition-delay: 0.4s; }
 .fade-in-delay-5 { transition-delay: 0.5s; }
 
+/* ── Micro Interactions ── */
+
+/* Hero badge pulse dot */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.6); }
+}
+
+.hero-badge-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+/* Brand icon rotation on hover */
+.nav-brand-icon {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-brand:hover .nav-brand-icon {
+  transform: rotate(360deg);
+}
+
+/* Card hover lift */
+.pain-card,
+.feature-card {
+  transition: border-color 0.2s, box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pain-card:hover,
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(26, 25, 22, 0.08);
+}
+
+/* Button press feedback */
+.hero-btn {
+  transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+}
+
+.hero-btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 8px rgba(26, 25, 22, 0.15);
+}
+
+.nav-link-primary:active,
+.mobile-nav-link-primary:active {
+  transform: scale(0.96);
+}
+
+/* Step number hover glow */
+.step-number {
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.step:hover .step-number {
+  box-shadow: 0 0 0 8px rgba(26, 25, 22, 0.08);
+  transform: scale(1.05);
+}
+
+/* Stat value count-up styling */
+.stat-value {
+  transition: color 0.3s;
+}
+
+.stat-item:hover .stat-value {
+  color: var(--sage-600);
+}
+
+/* Pricing card hover */
+.pain-card:has(.hero-btn:hover) {
+  border-color: var(--sage-100);
+  box-shadow: 0 16px 48px rgba(26, 25, 22, 0.1);
+}
+
+/* Smooth anchor scroll (global) */
+html {
+  scroll-behavior: smooth;
+}
+
 /* ---------- App Mockup ---------- */
 .mockup-browser {
   background: var(--cream-50);

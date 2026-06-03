@@ -89,6 +89,59 @@ function useFadeIn() {
   return ref;
 }
 
+/* ─── Animated Counter Hook ─── */
+function useCountUp(end, duration = 1500, suffix = '') {
+  const [display, setDisplay] = useState('0' + suffix);
+  const ref = useRef(null);
+  const counted = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !counted.current) {
+            counted.current = true;
+            const startTime = performance.now();
+
+            const animate = (now) => {
+              const elapsed = now - startTime;
+              const progress = Math.min(elapsed / duration, 1);
+              /* Ease out cubic */
+              const eased = 1 - Math.pow(1 - progress, 3);
+              const current = Math.round(eased * end);
+              setDisplay(current + suffix);
+              if (progress < 1) requestAnimationFrame(animate);
+            };
+            requestAnimationFrame(animate);
+          }
+        });
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [end, duration, suffix]);
+
+  return [ref, display];
+}
+
+/* ─── StatItem Component with Counter ─── */
+function StatItem({ value, suffix, label }) {
+  const numericValue = parseInt(value);
+  const isNumeric = !isNaN(numericValue);
+  const [ref, display] = useCountUp(isNumeric ? numericValue : 0, 1800, suffix || '');
+
+  return (
+    <div className="stat-item" ref={isNumeric ? ref : undefined}>
+      <div className="stat-value">{isNumeric ? display : value}</div>
+      <div className="stat-label" dangerouslySetInnerHTML={{ __html: label }} />
+    </div>
+  );
+}
+
 /* ─── Mockup Component ─── */
 function AppMockup() {
   return (
@@ -433,18 +486,9 @@ export default function Landing() {
             <h2 className="section-title">Dibangun untuk produktivitas akademik</h2>
           </div>
           <div className="stats-grid fade-in">
-            <div className="stat-item">
-              <div className="stat-value">85%</div>
-              <div className="stat-label">Lebih cepat menemukan<br />paper yang relevan</div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-value">3x</div>
-              <div className="stat-label">Lebih efisien dalam<br />literature review</div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-value">100%</div>
-              <div className="stat-label">Catatan terorganisir<br />dan mudah diakses</div>
-            </div>
+            <StatItem value="85" suffix="%" label="Lebih cepat menemukan<br />paper yang relevan" />
+            <StatItem value="3" suffix="x" label="Lebih efisien dalam<br />literature review" />
+            <StatItem value="100" suffix="%" label="Catatan terorganisir<br />dan mudah diakses" />
             <div className="stat-item">
               <div className="stat-value">∞</div>
               <div className="stat-label">Paper yang bisa<br />Anda kelola</div>
