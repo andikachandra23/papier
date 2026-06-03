@@ -18,7 +18,14 @@ client.interceptors.request.use((config) => {
 });
 
 client.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    /* Guard: if the server returns HTML instead of JSON (misconfigured VITE_API_URL), reject with a clear error */
+    const ct = response.headers?.['content-type'] || '';
+    if (ct.includes('text/html')) {
+      return Promise.reject(new Error('API returned HTML instead of JSON. Check VITE_API_URL in Railway environment variables.'));
+    }
+    return response;
+  },
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');

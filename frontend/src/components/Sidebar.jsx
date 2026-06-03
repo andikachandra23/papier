@@ -20,9 +20,10 @@ const Sidebar = ({ currentCategory, onCategoryChange, onShowAddCategory, onEditC
   const fetchCategories = async () => {
     try {
       const res = await client.get('/categories/');
-      setCategories(res.data);
+      setCategories(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error('Failed to fetch categories', err);
+      setCategories([]);
     }
   };
 
@@ -32,19 +33,22 @@ const Sidebar = ({ currentCategory, onCategoryChange, onShowAddCategory, onEditC
         client.get('/papers/'),
         client.get('/papers/?is_reading=true'),
       ]);
-      setAllCount(allRes.data.length);
-      setReadingCount(readingRes.data.length);
+      setAllCount(Array.isArray(allRes.data) ? allRes.data.length : 0);
+      setReadingCount(Array.isArray(readingRes.data) ? readingRes.data.length : 0);
     } catch (err) {
       console.error('Failed to fetch counts', err);
+      setAllCount(0);
+      setReadingCount(0);
     }
   };
 
   const fetchTags = async () => {
     try {
       const res = await client.get('/tags/');
-      setTags(res.data);
+      setTags(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error('Failed to fetch tags', err);
+      setTags([]);
     }
   };
 

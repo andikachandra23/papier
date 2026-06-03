@@ -41,18 +41,20 @@ const Library = ({ onLogout }) => {
   const fetchTags = async () => {
     try {
       const res = await client.get('/tags/');
-      setTags(res.data);
+      setTags(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error('Failed to fetch tags', err);
+      setTags([]);
     }
   };
 
   const fetchCategoriesData = async () => {
     try {
       const res = await client.get('/categories/');
-      setCategoriesData(res.data);
+      setCategoriesData(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error('Failed to fetch categories', err);
+      setCategoriesData([]);
     }
   };
 
@@ -72,9 +74,10 @@ const Library = ({ onLogout }) => {
       if (maxYear) params.max_year = parseInt(maxYear);
       // tag_id sudah di-handle dari currentCategory.startsWith('tag-') di atas
       const res = await client.get('/papers/', { params });
-      setPapers(res.data);
+      setPapers(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error('Failed to fetch papers', err);
+      setPapers([]);
     }
   }, [currentCategory, search, sort, minYear, maxYear]);
 
