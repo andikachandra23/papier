@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 /* ─── Inline SVG Icons ─── */
@@ -178,9 +178,30 @@ function AppMockup() {
   );
 }
 
+/* ─── Hamburger Icon ─── */
+function HamburgerIcon({ open }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {open ? (
+        <>
+          <path d="M18 6 6 18" />
+          <path d="m6 6 12 12" />
+        </>
+      ) : (
+        <>
+          <path d="M3 12h18" />
+          <path d="M3 6h18" />
+          <path d="M3 18h18" />
+        </>
+      )}
+    </svg>
+  );
+}
+
 /* ─── Landing Page ─── */
 export default function Landing() {
   const sectionRef = useFadeIn();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   /* Navbar scroll effect */
   useEffect(() => {
@@ -193,6 +214,17 @@ export default function Landing() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  /* Close mobile menu on resize */
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) setMobileMenuOpen(false);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const closeMobileMenu = () => setMobileMenuOpen(false);
+
   return (
     <div className="landing" ref={sectionRef}>
       {/* ─── Navbar ─── */}
@@ -201,13 +233,29 @@ export default function Landing() {
           <span className="nav-brand-icon">P</span>
           <span className="nav-brand-text">Papier</span>
         </a>
-        <div className="nav-links">
+        <div className="nav-links nav-links-desktop">
           <a href="#fitur" className="nav-link">Fitur</a>
           <a href="#cara-kerja" className="nav-link">Cara Kerja</a>
           <Link to="/login" className="nav-link">Masuk</Link>
           <Link to="/login" className="nav-link nav-link-primary">Mulai Gratis</Link>
         </div>
+        <button
+          className="nav-hamburger"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Menu"
+        >
+          <HamburgerIcon open={mobileMenuOpen} />
+        </button>
       </nav>
+
+      {/* Mobile menu overlay */}
+      <div className={`mobile-nav-overlay ${mobileMenuOpen ? 'open' : ''}`} onClick={closeMobileMenu} />
+      <div className={`mobile-nav ${mobileMenuOpen ? 'open' : ''}`}>
+        <a href="#fitur" className="mobile-nav-link" onClick={closeMobileMenu}>Fitur</a>
+        <a href="#cara-kerja" className="mobile-nav-link" onClick={closeMobileMenu}>Cara Kerja</a>
+        <Link to="/login" className="mobile-nav-link" onClick={closeMobileMenu}>Masuk</Link>
+        <Link to="/login" className="mobile-nav-link mobile-nav-link-primary" onClick={closeMobileMenu}>Mulai Gratis</Link>
+      </div>
 
       {/* ─── Hero ─── */}
       <section className="landing-hero">
