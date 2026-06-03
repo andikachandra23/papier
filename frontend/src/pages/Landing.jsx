@@ -289,6 +289,7 @@ export default function Landing() {
         <div className="nav-links nav-links-desktop">
           <a href="#fitur" className="nav-link">Fitur</a>
           <a href="#cara-kerja" className="nav-link">Cara Kerja</a>
+          <Link to="/docs" className="nav-link">Docs</Link>
           <Link to="/login" className="nav-link">Masuk</Link>
           <Link to="/login" className="nav-link nav-link-primary">Mulai Gratis</Link>
         </div>
@@ -306,6 +307,7 @@ export default function Landing() {
       <div className={`mobile-nav ${mobileMenuOpen ? 'open' : ''}`}>
         <a href="#fitur" className="mobile-nav-link" onClick={closeMobileMenu}>Fitur</a>
         <a href="#cara-kerja" className="mobile-nav-link" onClick={closeMobileMenu}>Cara Kerja</a>
+        <Link to="/docs" className="mobile-nav-link" onClick={closeMobileMenu}>Docs</Link>
         <Link to="/login" className="mobile-nav-link" onClick={closeMobileMenu}>Masuk</Link>
         <Link to="/login" className="mobile-nav-link mobile-nav-link-primary" onClick={closeMobileMenu}>Mulai Gratis</Link>
       </div>

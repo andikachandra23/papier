@@ -4,6 +4,7 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Library from './pages/Library';
 import Admin from './pages/Admin';
+import Docs from './pages/Docs';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -54,6 +55,7 @@ function App() {
           path="/"
           element={token ? <Navigate to="/app" replace /> : <Landing />}
         />
+        <Route path="/docs" element={<Docs />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
