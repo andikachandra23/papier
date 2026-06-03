@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
-import { GoogleLogin } from '@react-oauth/google';
+import React, { useState, lazy, Suspense } from 'react';
 import client from '../api/client';
 import LanguageSwitch from '../components/LanguageSwitch';
 import { useLanguage } from '../i18n/LanguageContext';
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
+/* Only load GoogleLogin when Google OAuth is configured */
+const LazyGoogleLogin = GOOGLE_CLIENT_ID
+  ? lazy(() => import('@react-oauth/google').then((mod) => ({ default: mod.GoogleLogin })))
+  : null;
 
 const Login = ({ onLogin }) => {
   const { t } = useLanguage();
@@ -85,24 +91,30 @@ const Login = ({ onLogin }) => {
             {loading ? t('common.loading') : (isRegister ? t('auth.register') : t('auth.signIn'))}
           </button>
         </form>
-        <div className="login-divider">
-          <span>{t('auth.or')}</span>
-        </div>
-        <div className="google-login-wrapper">
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={handleGoogleError}
-            text="signin_with"
-            shape="rectangular"
-            width="100%"
-            disabled={googleLoading}
-          />
-          {googleLoading && (
-            <p style={{ textAlign: 'center', fontSize: '13px', color: 'var(--ink-400)', marginTop: '8px' }}>
-              {t('common.loading')}
-            </p>
-          )}
-        </div>
+        {LazyGoogleLogin && (
+          <>
+            <div className="login-divider">
+              <span>{t('auth.or')}</span>
+            </div>
+            <div className="google-login-wrapper">
+              <Suspense fallback={<p style={{ textAlign: 'center', fontSize: '13px', color: 'var(--ink-400)' }}>{t('common.loading')}</p>}>
+                <LazyGoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  text="signin_with"
+                  shape="rectangular"
+                  width="100%"
+                  disabled={googleLoading}
+                />
+              </Suspense>
+              {googleLoading && (
+                <p style={{ textAlign: 'center', fontSize: '13px', color: 'var(--ink-400)', marginTop: '8px' }}>
+                  {t('common.loading')}
+                </p>
+              )}
+            </div>
+          </>
+        )}
         <p style={{ textAlign: 'center', marginTop: '16px', fontSize: '13px', color: 'var(--ink-400)' }}>
           {isRegister ? t('auth.haveAccount') : t('auth.noAccount')}{' '}
           <button
