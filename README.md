@@ -1,19 +1,19 @@
 # Papier
 
-> Platform manajemen paper penelitian untuk akademisi. Upload, baca, highlight, catat, dan dapatkan ringkasan AI — semua di satu tempat.
+> A research paper management platform for academics. Upload, read, highlight, annotate, and get AI summaries — all in one place.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## Fitur
+## Features
 
-- 📄 **Upload & Impor Paper** — Upload PDF atau impor metadata via DOI
-- 📖 **PDF Viewer Terintegrasi** — Baca dan anotasi PDF langsung di aplikasi
-- 🖍️ **Highlight & Anotasi** — Tandai bagian penting dengan warna berbeda
-- 📝 **Catatan Per Paper** — Tulis insight yang tertaut langsung ke paper
-- 🤖 **Ringkasan AI** — Dapatkan ringkasan otomatis menggunakan AI
-- 🏷️ **Kategori & Tag** — Organisir paper dengan kategori dan tag fleksibel
-- 🔐 **Google Auth** — Login dengan akun Google
-- 📧 **Mailing List** — Otomatis subscribe ke kirim.email
+- 📄 **Upload & Import Papers** — Upload PDFs or import metadata via DOI
+- 🖨️ **Integrated PDF Viewer** — Read and annotate PDFs directly in the app
+- 🖍️ **Highlights & Annotations** — Mark important sections with different colors
+- 📝 **Notes Per Paper** — Write insights linked directly to papers
+- 🤖 **AI Summaries** — Get automatic summaries powered by AI
+- 🏷️ **Categories & Tags** — Organize papers with flexible categories and tags
+- 🔐 **Google Auth** — Sign in with your Google account
+- 📧 **Mailing List** — Automatic subscription via kirim.email
 
 ## Tech Stack
 
@@ -67,8 +67,8 @@ Open http://localhost:5173
 See [backend/RAILWAY_DEPLOY.md](backend/RAILWAY_DEPLOY.md) for detailed instructions.
 
 ### Quick Steps:
-1. Create Railway project
-2. Add PostgreSQL plugin
+1. Create a Railway project
+2. Add the PostgreSQL plugin
 3. Add Backend service (root: `/backend`)
 4. Add Frontend service (root: `/`)
 5. Set environment variables (see `.env.example` files)
@@ -94,7 +94,8 @@ See [backend/RAILWAY_DEPLOY.md](backend/RAILWAY_DEPLOY.md) for detailed instruct
 | Variable | Description |
 |----------|-------------|
 | `VITE_GOOGLE_CLIENT_ID` | Google OAuth Client ID (same as backend) |
+| `VITE_API_URL` | Backend API URL (e.g. `https://your-backend.up.railway.app`) |
 
 ## License
 
-[MIT](LICENSE) — Gratis untuk penggunaan akademik.
+[MIT](LICENSE) — Free for academic use.
