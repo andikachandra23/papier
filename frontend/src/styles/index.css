@@ -714,6 +714,45 @@ textarea.input-field { resize: vertical; }
     width: 100%;
     padding: 24px 16px;
   }
+
+  /* PDF Viewer toolbar: wrap and compact */
+  .pdf-toolbar {
+    flex-wrap: wrap;
+    padding: 6px 8px;
+    gap: 6px;
+    min-height: auto;
+  }
+  .pdf-toolbar-left { flex: 0 0 auto; min-width: 0; }
+  .pdf-toolbar-title { display: none; }
+  .pdf-toolbar-center { order: 2; width: 100%; justify-content: center; }
+  .pdf-toolbar-right {
+    flex: 1;
+    justify-content: flex-end;
+    gap: 2px;
+    min-width: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .pdf-toolbar-right::-webkit-scrollbar { display: none; }
+  .pdf-toolbar-btn { padding: 5px; }
+  .pdf-toolbar-divider { display: none; }
+  .pdf-highlight-indicator span { display: none; }
+  .pdf-highlight-indicator { padding: 4px; }
+
+  .pdf-nav-btn { display: none; }
+
+  /* Summary panel: full width on mobile */
+  .summary-panel-overlay,
+  .summary-panel {
+    width: 100%;
+  }
+
+  /* Highlight list popup: full width */
+  .highlight-list-popup {
+    width: calc(100vw - 40px);
+    max-width: 340px;
+  }
 }
 
 /* Toast */
