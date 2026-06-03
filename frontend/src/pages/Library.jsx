@@ -37,6 +37,7 @@ const Library = ({ onLogout }) => {
   const [sidebarKey, setSidebarKey] = useState(0);
   const [pdfViewerPaper, setPdfViewerPaper] = useState(null);
   const [showNotesModal, setShowNotesModal] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const fetchTags = async () => {
     try {
@@ -244,23 +245,38 @@ const Library = ({ onLogout }) => {
 
   return (
     <div className="app-layout">
+      {/* Mobile sidebar overlay */}
+      <div
+        className={`sidebar-mobile-overlay ${sidebarOpen ? 'open' : ''}`}
+        onClick={() => setSidebarOpen(false)}
+      />
       <Sidebar
         key={sidebarKey}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
         onLogout={onLogout}
         currentCategory={currentCategory}
-        onCategoryChange={setCurrentCategory}
-        onShowAddCategory={() => setShowAddCategory(true)}
+        onCategoryChange={(cat) => { setCurrentCategory(cat); setSidebarOpen(false); }}
+        onShowAddCategory={() => { setShowAddCategory(true); setSidebarOpen(false); }}
         onEditCategory={handleOpenEditCategory}
         onTagChange={(tagValue) => {
           const tagIdValue = tagValue.replace('tag-', '');
           setCurrentCategory(tagValue);
           setTagId(tagIdValue);
+          setSidebarOpen(false);
         }}
       />
       <div className="main-content">
         <div className="main-header">
           <div className="main-header-top">
-            <h1 className="page-title">{getCategoryTitle()}</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <button className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label="Toggle sidebar">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 12h18"/><path d="M3 6h18"/><path d="M3 18h18"/>
+                </svg>
+              </button>
+              <h1 className="page-title">{getCategoryTitle()}</h1>
+            </div>
             <div className="header-actions" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
               <button className="btn btn-primary" onClick={() => setShowImportDOI(true)}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">

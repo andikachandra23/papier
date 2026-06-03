@@ -623,6 +623,99 @@ textarea.input-field { resize: vertical; }
 }
 .color-swatch.selected { border-color: var(--ink-900); }
 
+
+/* ── Mobile Toggle Button ── */
+.sidebar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: var(--ink-700);
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.sidebar-toggle:hover { background: var(--cream-100); }
+
+.sidebar-mobile-overlay {
+  display: none;
+}
+
+/* ── App Mobile Responsive ── */
+@media (max-width: 768px) {
+  /* Sidebar: overlay drawer on mobile */
+  .app-layout { position: relative; }
+
+  .sidebar-toggle { display: flex; align-items: center; justify-content: center; }
+
+  .sidebar-mobile-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(26, 25, 22, 0.3);
+    z-index: 40;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .sidebar-mobile-overlay.open { opacity: 1; pointer-events: all; }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 50;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: none;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Header: stack and wrap */
+  .main-header { padding: 16px 16px 12px; }
+  .main-header-top {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .page-title { font-size: 22px; }
+
+  .header-actions {
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+  }
+  .header-actions .btn { font-size: 12px; padding: 6px 10px; }
+  .header-actions .btn-sm { padding: 5px 8px; font-size: 11px; }
+
+  .header-controls {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+  .header-controls .search-bar { width: 100%; }
+  .header-controls .sort-select { width: 100%; }
+
+  /* Paper grid: single column */
+  .paper-grid-container { padding: 0 16px 16px; }
+  .paper-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* Item count */
+  .item-count { padding: 12px 16px; flex-direction: column; gap: 8px; align-items: flex-start; }
+
+  /* Detail panel: full width */
+  .detail-panel {
+    width: 100%;
+    padding: 24px 16px;
+  }
+}
+
 /* Toast */
 .toast {
   position: fixed;

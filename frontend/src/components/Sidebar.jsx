@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import client from '../api/client';
 import { useLanguage } from '../i18n/LanguageContext';
 
-const Sidebar = ({ currentCategory, onCategoryChange, onShowAddCategory, onEditCategory, onTagChange, onLogout }) => {
+const Sidebar = ({ isOpen, onClose, currentCategory, onCategoryChange, onShowAddCategory, onEditCategory, onTagChange, onLogout }) => {
   const { t } = useLanguage();
   const [categories, setCategories] = useState([]);
   const [allCount, setAllCount] = useState(0);
@@ -72,7 +72,7 @@ const Sidebar = ({ currentCategory, onCategoryChange, onShowAddCategory, onEditC
   };
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-brand">Papier</div>
 
       <div
