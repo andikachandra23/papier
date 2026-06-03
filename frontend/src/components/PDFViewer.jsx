@@ -18,6 +18,11 @@ import {
 } from '../utils/pdfHighlight';
 import AutoHighlightPanel from './AutoHighlightPanel';
 
+// API base URL for fetching resources
+const API_BASE = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : '/api';
+
 // Setup PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.mjs',
@@ -55,7 +60,7 @@ const PDFViewer = ({ paper, isOpen, onClose, onPaperUpdate }) => {
   const pdfSource = useMemo(() => {
     if (!paper?.id) return null;
     return {
-      url: `/api/papers/${paper.id}/pdf`,
+      url: `${API_BASE}/papers/${paper.id}/pdf`,
       httpHeaders: {
         Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
       },
@@ -117,7 +122,7 @@ const PDFViewer = ({ paper, isOpen, onClose, onPaperUpdate }) => {
 
     if (paper?.id) {
       try {
-        const resp = await fetch(`/api/papers/${paper.id}/pdf`, {
+        const resp = await fetch(`${API_BASE}/papers/${paper.id}/pdf`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
         });
         if (!resp.ok) {
