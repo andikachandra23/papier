@@ -11,10 +11,12 @@ frontend/.env
 frontend/.env.*
 !frontend/.env.example
 
-# Python cache and local database/uploads.
+# Python cache, virtual environments, and local database/uploads.
 __pycache__/
 *.py[cod]
 backend/**/*.pyc
+venv/
+backend/venv/
 backend/research_lib.db
 backend/uploads/
 

@@ -22,7 +22,7 @@ client.interceptors.response.use(
     /* Guard: if the server returns HTML instead of JSON (misconfigured VITE_API_URL), reject with a clear error */
     const ct = response.headers?.['content-type'] || '';
     if (ct.includes('text/html')) {
-      return Promise.reject(new Error('API returned HTML instead of JSON. Check VITE_API_URL in Railway environment variables.'));
+      return Promise.reject(new Error('API returned HTML instead of JSON. Check that VITE_API_URL points to the backend API URL.'));
     }
     return response;
   },

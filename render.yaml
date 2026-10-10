@@ -1,0 +1,55 @@
+# Render Blueprint for Papier backend (FastAPI) — free tier friendly.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Usage: Render Dashboard -> New -> Blueprint -> connect this repository.
+# Secrets marked with `sync: false` must be filled in from the dashboard.
+services:
+  - type: web
+    name: papier-backend
+    runtime: python
+    plan: free
+    region: singapore
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: python migrate.py && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      # Pin a stable Python version (app requires 3.10+).
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: ENVIRONMENT
+        value: production
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "60"
+      # --- Required secrets (fill in the Render dashboard) ---
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: AI_API_KEY
+        sync: false
+      # --- AI defaults (override if you use another provider) ---
+      - key: AI_BASE_URL
+        value: https://api.deepseek.com
+      - key: AI_MODEL
+        value: deepseek-chat
+      - key: AI_DEFAULT_MODEL
+        value: mimo-v2.5-pro
+      - key: CONTACT_EMAIL
+        value: admin@papier.app
+      # --- Cloudflare R2 (required on Render free: no persistent disk) ---
+      - key: R2_ACCOUNT_ID
+        sync: false
+      - key: R2_ACCESS_KEY_ID
+        sync: false
+      - key: R2_SECRET_ACCESS_KEY
+        sync: false
+      - key: R2_BUCKET_NAME
+        value: research-lib
