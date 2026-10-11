@@ -31,28 +31,69 @@ Vercel (React SPA)  ── VITE_API_URL ──▶  Render (FastAPI + Uvicorn)
 
 ## LANGKAH 0 — Push ke GitHub ⚠️ (kerjakan pertama)
 
-Repo lokal punya **2 commit belum ter-push** (termasuk `render.yaml` & `vercel.json`).
+Repo lokal punya commit yang belum ter-push (termasuk `render.yaml`, `vercel.json`, `DEPLOY_FREE_TIER.md`).
+Cek dulu:
 
-Jalankan di **terminal VS Code** (bukan di chat), dari folder repo:
+```bash
+cd /Users/andika/Documents/WORK/PRIBADI/PROJECT/manajemen-riset
+git status -sb                                  # harapkan: "## main...origin/main [ahead N]"
+git --no-pager log --oneline origin/main..main  # daftar commit yang akan dikirim
+```
+
+> Remote memakai **HTTPS** → saat push, git meminta **Username + Password**, dan **password akun GitHub sudah tidak berlaku**. Gunakan **PAT** (Metode A) atau login browser via `gh` (Metode B).
+
+### Metode A — Personal Access Token (paling cepat, tanpa install)
+
+1. Buat token: https://github.com/settings/tokens → **Tokens (classic)** → **Generate new token (classic)** → scope **`repo`** → Generate → salin (`ghp_…`, hanya tampil sekali).
+2. Push lalu isi username `andikachandra23` dan tempel token sebagai password:
 
 ```bash
 cd /Users/andika/Documents/WORK/PRIBADI/PROJECT/manajemen-riset
 git push origin main
+# Username for 'https://github.com': andikachandra23
+# Password for 'https://andikachandra23@github.com': <tempel PAT — tidak terlihat saat dipaste>
 ```
 
-- [ ] Push berhasil — cek: `git status` tidak lagi menampilkan "(ahead …)"
-- [ ] Verifikasi di https://github.com/andikachandra23/papier → file `render.yaml` & `vercel.json` terlihat
+> Token otomatis tersimpan di macOS Keychain → push berikutnya tidak akan prompt lagi.
 
-**Jika gagal autentikasi, pilih salah satu:**
+### Metode B — GitHub CLI (login via browser)
 
 ```bash
-# Opsi A — Personal Access Token (scope: repo)
-git push https://andikachandra23@github.com/andikachandra23/papier.git main
-# saat diminta "Password", tempel TOKEN (bukan password akun)
-
-# Opsi B — GitHub CLI
-brew install gh && gh auth login && git push origin main
+brew install gh
+gh auth login            # GitHub.com -> HTTPS -> Login with a web browser
+gh auth setup-git
+cd /Users/andika/Documents/WORK/PRIBADI/PROJECT/manajemen-riset && git push origin main
 ```
+
+### Metode C — SSH (alternatif, sekali setup)
+
+```bash
+ssh-keygen -t ed25519 -C "136653807+andikachandra23@users.noreply.github.com"
+pbcopy < ~/.ssh/id_ed25519.pub     # tempel di https://github.com/settings/keys -> New SSH key
+ssh -T git@github.com              # uji: "Hi andikachandra23! You've successfully authenticated..."
+cd /Users/andika/Documents/WORK/PRIBADI/PROJECT/manajemen-riset
+git remote set-url origin git@github.com:andikachandra23/papier.git
+git push origin main
+```
+
+### Verifikasi berhasil
+
+```bash
+git fetch origin
+git status -sb      # harapkan: "## main...origin/main" (TANPA "[ahead ...]")
+```
+
+- [ ] `git status` bersih (tidak ada "ahead")
+- [ ] Di https://github.com/andikachandra23/papier terlihat `render.yaml`, `vercel.json`, `DEPLOY_FREE_TIER.md`
+
+### Jika muncul error
+
+| Error | Solusi |
+|---|---|
+| `could not read Username ... prompts disabled` | Belum ada kredensial → jalankan Metode A / B / C |
+| `Authentication failed` / `password authentication was removed` | Isi **PAT** (bukan password akun) sebagai password |
+| `Permission ... denied` | Token kurang scope **`repo`** atau username salah |
+| `[rejected] ... (fetch first)` | `git pull --rebase origin main` lalu push lagi |
 
 > Jangan pernah menempelkan token ke dalam chat.
 
