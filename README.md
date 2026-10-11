@@ -78,6 +78,8 @@ See [backend/RAILWAY_DEPLOY.md](backend/RAILWAY_DEPLOY.md) for detailed instruct
 
 Frontend on Vercel, backend on Render (free), PostgreSQL on Neon (free), and PDF storage on Cloudflare R2 (free). The backend runs on Render's native Python runtime — no Docker needed.
 
+> 📋 **Step-by-step manual checklist:** [DEPLOY_FREE_TIER.md](DEPLOY_FREE_TIER.md)
+
 ### 1. Database — Neon (free PostgreSQL)
 
 1. Create a project at [neon.tech](https://neon.tech) and pick a region close to your users.
