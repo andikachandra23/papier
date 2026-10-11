@@ -130,16 +130,29 @@ git status -sb      # harapkan: "## main...origin/main" (TANPA "[ahead ...]")
 
 ## LANGKAH 3 — Backend: Render Free (via Blueprint)
 
-- [ ] Buka https://dashboard.render.com → **New +** → **Blueprint**
-- [ ] Connect akun GitHub → pilih repo `andikachandra23/papier`
-- [ ] Render membaca `render.yaml` otomatis. Beri nama Blueprint (mis. `papier`).
-- [ ] Render meminta nilai untuk variabel `sync: false`. Isi sesuai tabel:
+Butuh: repo sudah ter-push (Langkah 0), `DATABASE_URL` (Langkah 1), kredensial R2 (Langkah 2), serta Google & AI keys.
+
+### 3.1 Hubungkan GitHub ke Render
+
+- [ ] Buka https://dashboard.render.com → **Sign in with GitHub**
+- [ ] Izinkan Render mengakses repo `andikachandra23/papier` (GitHub App); jika perlu **Configure account** → beri akses ke repo tersebut
+
+### 3.2 Buat Blueprint
+
+- [ ] **New +** → pilih **Blueprint**
+- [ ] Pilih repository `andikachandra23/papier`
+- [ ] Render mendeteksi `render.yaml` → beri nama Blueprint (mis. `papier`)
+- [ ] Render menampilkan 1 resource: **Web Service `papier-backend`** (Free · Singapore · rootDir `backend`)
+
+### 3.3 Isi Environment Variables
+
+Saat klik **Apply**, Render meminta nilai untuk variabel `sync: false`:
 
 | Env var | Nilai | Sumber |
 |---|---|---|
-| `DATABASE_URL` | `postgresql://…` | Langkah 1 (Neon) |
-| `SECRET_KEY` | string acak 64 char | generate (lihat bawah) |
-| `CORS_ORIGINS` | `https://<domain-vercel>` | Langkah 4 |
+| `DATABASE_URL` | `postgresql://…?sslmode=require` | Langkah 1 (Neon) |
+| `SECRET_KEY` | string acak 64 char | generate (bawah) |
+| `CORS_ORIGINS` | `https://placeholder.example` (sementara) | diubah di Langkah 4 |
 | `GOOGLE_CLIENT_ID` | `…apps.googleusercontent.com` | Google Cloud Console |
 | `GOOGLE_CLIENT_SECRET` | `…` | Google Cloud Console |
 | `AI_API_KEY` | API key AI | DeepSeek |
@@ -153,13 +166,31 @@ Generate `SECRET_KEY`:
 python3 -c "import secrets; print(secrets.token_urlsafe(64))"
 ```
 
-- [ ] Klik **Apply / Create** → tunggu build & deploy selesai (~2–5 menit)
-- [ ] Catat URL backend (mis. `https://papier-backend.onrender.com`)
-- [ ] Cek health: `https://papier-backend.onrender.com/api/health` → harus `{"status":"ok"}`
+> Variabel non-rahasia (`ENVIRONMENT=production`, `PYTHON_VERSION=3.11.9`, `AI_BASE_URL`, `AI_MODEL`, `RATE_LIMIT_PER_MINUTE`, `CONTACT_EMAIL`, `R2_BUCKET_NAME`) sudah otomatis dari `render.yaml` — tidak perlu diisi manual.
 
-> Jika domain Vercel belum final, isi `CORS_ORIGINS=https://placeholder.example` dulu, lalu update setelah Langkah 4 (Render restart otomatis).
+### 3.4 Deploy & Verifikasi
 
-> `migrate.py` dijalankan tiap deploy (idempotent): buat tabel, tambah kolom, seed setting AI, dan promote **user pertama** jadi admin.
+- [ ] Klik **Create / Apply Blueprint** → tunggu build & deploy (~2–5 menit)
+- [ ] Buka tab **Logs** → tunggu sampai muncul `✅ Migration complete!`
+- [ ] Catat **URL service**, mis. `https://papier-backend.onrender.com`
+- [ ] Tes health: buka `https://papier-backend.onrender.com/api/health` → harus `{"status":"ok"}`
+
+```bash
+curl -s https://papier-backend.onrender.com/api/health   # {"status":"ok"}
+```
+
+> `migrate.py` berjalan tiap deploy (idempotent): buat tabel, tambah kolom, seed setting AI, dan promote **user pertama** jadi admin.
+
+### 3.5 Troubleshooting LANGKAH 3
+
+| Gejala | Penyebab | Solusi |
+|---|---|---|
+| Build gagal di `pip install` | wheel / versi Python | `PYTHON_VERSION=3.11.9` sudah diset; cek log build |
+| Deploy sukses tapi health check gagal (503) | `migrate.py` error / DB tak connect | cek `DATABASE_URL` (harus `postgresql://`, bukan `postgres://`), cek log |
+| `ModuleNotFoundError: No module named 'app'` | rootDir / start command salah | Root Directory = `backend`, start `uvicorn app.main:app` |
+| API 500 saat dipakai | env kurang (R2/AI) | lengkapi `R2_*` / `AI_API_KEY`, cek log |
+| Service tidur / lambat | Free spin-down (~15 menit idle) | normal; request pertama lambat |
+| Perlu ubah env | — | **Environment** → ubah → Render restart otomatis |
 
 ---
 
@@ -188,15 +219,24 @@ python3 -c "import secrets; print(secrets.token_urlsafe(64))"
 
 ## LANGKAH 6 — Akun Admin
 
-- [ ] Login/register user pertama lewat frontend → otomatis dipromosikan jadi admin
+> ⚠️ **Render Free TIDAK mendukung Shell/SSH** — jadi `python create_user.py` **tidak bisa** dijalankan dari dashboard Render. Gunakan salah satu cara di bawah.
 
-ATAU jalankan sekali di **Render → service → Shell**:
+### Cara 1 (termudah) — Register lalu redeploy
+
+- [ ] Register user pertama lewat frontend (`/login` → buat akun)
+- [ ] Di Render → service → **Manual Deploy → Deploy latest commit** (restart)
+- [ ] `migrate.py` mendeteksi belum ada admin → **promote user pertama jadi admin**
+
+### Cara 2 — Jalankan `create_user.py` dari komputer lokal (menuju Neon)
 
 ```bash
-python create_user.py
+cd backend
+DATABASE_URL='postgresql://…neon…?sslmode=require' python create_user.py
 ```
 
 Default: `admin@papier.app` / `admin123` → **ganti password setelah login!**
+
+> Jangan gunakan **Render Postgres** untuk produksi: free tier-nya hanya 1 GB & **kedaluwarsa 30 hari**. Tetap pakai **Neon**.
 
 ---
 
